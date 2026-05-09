@@ -88,7 +88,7 @@ jobs:
           echo "---------------------------------------------------------------"
           echo "Pinging back-end..."
           echo "---------------------------------------------------------------"
-          curl --location 'http://localhost:5002'
+          curl --location 'http://localhost:3002'
 
       - name: Run UI Tests with Fullstack Coverage
         uses: cypress-io/github-action@v7
