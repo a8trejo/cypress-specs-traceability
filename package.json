@@ -53,7 +53,7 @@
     "prestart": "npm run db:seed:dev",
     "start": "cross-env NODE_ENV=development concurrently npm:start:react npm:start:api",
     "start:api": "npm run tsnode -- --files backend/app.ts",
-    "start:api:watch": "nodemon --exec npm run tsnode --watch 'backend' backend/app.ts",
+    "start:api:watch": "nodemon --exec npm run tsnode --watch 'backend' --ignore 'cypress/**' --ignore 'coverage/**' --ignore '*.log' backend/app.ts",
     "prestart:ci": "npm run predev:cognito:ci",
     "start:ci": "cross-env NODE_ENV=test concurrently npm:start:react:proxy-server npm:start:api",
     "prestart:empty": "npm run db:seed:empty",

@@ -29,13 +29,8 @@ beforeEach(() => {
         cy.task('deleteFolder', 'results/reports/verbose')
     }
 
-    // Reset Backend coverage counters before each test so we get per-test coverage
-    if (Cypress.env('mapNodeCoverage')) {
-        const coverageUrl = Cypress.env('codeCoverage').url
-        if (coverageUrl) {
-            cy.request({ method: 'DELETE', url: coverageUrl, failOnStatusCode: false, log: true })
-        }
-    }
+    // NOTE: Coverage reset moved to afterEach() to avoid interfering with page load
+    // Resetting in beforeEach() was causing "sorry we could not load" errors
 })
 
 afterEach(function () {
@@ -79,6 +74,10 @@ afterEach(function () {
                     cy.logger(noCoverageMsg)
                 }
             })
+
+            // Reset backend coverage AFTER collecting it, so next test starts fresh
+            // This prevents coverage from mixing between tests in the same spec
+            cy.request({ method: 'DELETE', url: coverageUrl, failOnStatusCode: false, log: false })
         }
     }
 })

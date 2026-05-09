@@ -34,6 +34,7 @@ export default defineConfig(async ({ mode }) => {
       watch: {
         ignored: ["**/cypress/**", "**/coverage/**"],
       },
+      hmr: process.env.CYPRESS_COVERAGE ? false : true,
     },
     build: {
       outDir: "build",
