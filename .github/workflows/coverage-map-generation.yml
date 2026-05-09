@@ -71,10 +71,24 @@ jobs:
       - name: Start Dev Servers
         run: |
           npm run dev:coverage >> dev-servers-${{ strategy.job-index }}.log 2>&1 &
-          npx wait-on http://localhost:3000/signin http://localhost:3002 -t 120000
+          npx wait-on http://localhost:3000/signin -t 120000
+          echo 'http://localhost:3000/signin is up and running!'
+          npx wait-on http://localhost:3002 -t 120000
+          echo 'http://localhost:3002 is up and running!'
         env:
           NODE_ENV: development
           CYPRESS_COVERAGE: true
+
+      - name: Localhost Health-Check
+        run: |
+          echo "Pinging front-end..."
+          echo "---------------------------------------------------------------"
+          curl --location 'http://localhost:3000/signin'
+
+          echo "---------------------------------------------------------------"
+          echo "Pinging back-end..."
+          echo "---------------------------------------------------------------"
+          curl --location 'http://localhost:5002'
 
       - name: Run UI Tests with Fullstack Coverage
         uses: cypress-io/github-action@v7
