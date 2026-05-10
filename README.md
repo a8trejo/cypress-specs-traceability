@@ -187,13 +187,6 @@ npm run cypress:open
 }
 ```
 
-## 🛠 Technology Stack
-
-- **Frontend**: React, XState, Material-UI, TypeScript
-- **Backend**: Express, lowdb, TypeScript
-- **Testing**: Cypress, @cypress/code-coverage
-- **CI/CD**: GitHub Actions, Python
-
 ## 📝 Environment Variables
 
 ```bash
