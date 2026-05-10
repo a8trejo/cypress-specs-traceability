@@ -16,6 +16,7 @@ env:
 
 jobs:
   init:
+    if: ${{ !contains(github.event.pull_request.head.user.login, 'github-actions')   }}
     runs-on: ubuntu-latest
     outputs:
       MATRIX_CONFIG: ${{ steps.cypress-strategy-config.outputs.MATRIX_CONFIG }}
