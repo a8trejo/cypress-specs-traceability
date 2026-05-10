@@ -39,7 +39,7 @@ from typing import Dict, List, Tuple, Optional
 # Constants
 DEFAULT_SPECS_PER_CONTAINER = 3
 DEFAULT_MATRIX = "[1, 2, 3, 4, 5]"
-DEFAULT_SPEC_PATTERN = "cypress/src/**/*.cy.{js,jsx,ts,tsx}"
+DEFAULT_SPEC_PATTERN = "cypress/src/**/*.spec.ts"
 SEPARATOR = "-" * 130
 
 
