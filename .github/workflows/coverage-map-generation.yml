@@ -148,6 +148,9 @@ jobs:
     needs: [init, coverage-tests]
     if: ${{ always() && needs.coverage-tests.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -179,6 +182,20 @@ jobs:
           name: merged-coverage-map
           path: artifacts/coverage-map.json
           retention-days: 30
+
+      # Commit and push changelog updates
+      - name: Push Coverage Map
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          echo "Running git add and commit..."
+          git add artifacts/coverage-map.json
+          git commit -m "Updating coverage-map.json file"
+          git status
+          echo "--------------------------------------------------------------------------------"
+          echo "Pushing to remote..."
+          echo "--------------------------------------------------------------------------------"
+          git push
 
       - name: Summary
         if: ${{ steps.map-files.outputs.json-files != '' }}
