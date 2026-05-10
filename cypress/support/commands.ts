@@ -449,8 +449,17 @@ Cypress.Commands.add(
 
         cy.task('readJsonMaybe', coverageMapPath).then((mapJson: any) => {
             Object.keys(coverageObject).forEach(srcFile => {
-                // Use the last occurrence of rootPath to handle CI paths
-                const pathParts = coverageObject[srcFile].path.split(rootPath)
+                let fullPath = coverageObject[srcFile].path
+
+                // Strip CI-specific path prefix if present
+                // e.g., /home/runner/work/cypress-specs-traceability/cypress-specs-traceability/src/...
+                const ciPathPattern = /^\/home\/runner\/work\/[^\/]+\/[^\/]+\//
+                if (ciPathPattern.test(fullPath)) {
+                    fullPath = fullPath.replace(ciPathPattern, '')
+                }
+
+                // Use the last occurrence of rootPath to handle any remaining path variations
+                const pathParts = fullPath.split(rootPath)
                 let relativePath = pathParts.at(-1)
                 // Docker Node paths include dist/ prefix (e.g. dist/src/modules/...) — strip it
                 if (!isFrontendCoverage && relativePath?.startsWith('dist/')) {
