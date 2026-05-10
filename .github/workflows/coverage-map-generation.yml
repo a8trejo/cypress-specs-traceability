@@ -10,7 +10,8 @@ concurrency:
 
 env:
   COVERAGE_MAP_PATH: 'cypress/results/reports/coverage-map'
-  COVERAGE_MAP_NAME: 'coverage-map.json'
+  FRONTEND_COVERAGE_MAP_NAME: 'coverage-map.json'
+  BACKEND_COVERAGE_MAP_NAME: 'node-coverage-map.json'
 
 jobs:
   init:
@@ -65,13 +66,30 @@ jobs:
       - name: Setup Mock AWS Exports
         run: npm run predev:cognito:ci
 
+      - name: Seed Database
+        run: npm run db:seed:dev
+
       - name: Start Dev Servers
         run: |
           npm run dev:coverage >> dev-servers-${{ strategy.job-index }}.log 2>&1 &
-          npx wait-on http://localhost:3000 http://localhost:3002 -t 120000
+          npx wait-on http://localhost:3000/signin -t 120000
+          echo 'http://localhost:3000/signin is up and running!'
+          npx wait-on http://localhost:3001 -t 120000
+          echo 'http://localhost:3001 is up and running!'
         env:
           NODE_ENV: development
           CYPRESS_COVERAGE: true
+
+      - name: Localhost Health-Check
+        run: |
+          echo "Pinging front-end..."
+          echo "---------------------------------------------------------------"
+          curl --location 'http://localhost:3000/signin'
+
+          echo "---------------------------------------------------------------"
+          echo "Pinging back-end..."
+          echo "---------------------------------------------------------------"
+          curl --location 'http://localhost:3001'
 
       - name: Run UI Tests with Fullstack Coverage
         uses: cypress-io/github-action@v7
@@ -96,26 +114,48 @@ jobs:
           echo "========== Dev Server Logs =========="
           cat dev-servers-${{ strategy.job-index }}.log || echo "No dev server logs found"
 
-      - name: Rename Coverage Map
-        id: coverage-map
+      - name: Rename Frontend Coverage Map
+        id: frontend-coverage-map
         env:
           FILE_PATH: ${{ env.COVERAGE_MAP_PATH }}
-          FILE_NAME: ${{ env.COVERAGE_MAP_NAME }}
+          FILE_NAME: ${{ env.FRONTEND_COVERAGE_MAP_NAME }}
           JOB_INDEX: ${{ strategy.job-index }}
         run: |
           if [ -f "$FILE_PATH/$FILE_NAME" ]; then
-            mv $FILE_PATH/$FILE_NAME $FILE_PATH/coverage-e2e-$JOB_INDEX-$FILE_NAME
-            echo "MAP_PATH=$FILE_PATH/coverage-e2e-$JOB_INDEX-$FILE_NAME" >> $GITHUB_OUTPUT
+            mv $FILE_PATH/$FILE_NAME $FILE_PATH/frontend-coverage-$JOB_INDEX-$FILE_NAME
+            echo "MAP_PATH=$FILE_PATH/frontend-coverage-$JOB_INDEX-$FILE_NAME" >> $GITHUB_OUTPUT
           else
-            echo "Coverage map not found: $FILE_PATH/$FILE_NAME (skipping)"
+            echo "Frontend coverage map not found: $FILE_PATH/$FILE_NAME (skipping)"
           fi
 
-      - name: Persist Coverage Map
-        if: ${{ steps.coverage-map.outputs.MAP_PATH != '' }}
+      - name: Rename Backend Coverage Map
+        id: backend-coverage-map
+        env:
+          FILE_PATH: ${{ env.COVERAGE_MAP_PATH }}
+          FILE_NAME: ${{ env.BACKEND_COVERAGE_MAP_NAME }}
+          JOB_INDEX: ${{ strategy.job-index }}
+        run: |
+          if [ -f "$FILE_PATH/$FILE_NAME" ]; then
+            mv $FILE_PATH/$FILE_NAME $FILE_PATH/backend-coverage-$JOB_INDEX-$FILE_NAME
+            echo "MAP_PATH=$FILE_PATH/backend-coverage-$JOB_INDEX-$FILE_NAME" >> $GITHUB_OUTPUT
+          else
+            echo "Backend coverage map not found: $FILE_PATH/$FILE_NAME (skipping)"
+          fi
+
+      - name: Persist Frontend Coverage Map
+        if: ${{ steps.frontend-coverage-map.outputs.MAP_PATH != '' }}
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-e2e-${{ strategy.job-index }}
-          path: ${{ steps.coverage-map.outputs.MAP_PATH }}
+          name: frontend-coverage-${{ strategy.job-index }}
+          path: ${{ steps.frontend-coverage-map.outputs.MAP_PATH }}
+          retention-days: 1
+
+      - name: Persist Backend Coverage Map
+        if: ${{ steps.backend-coverage-map.outputs.MAP_PATH != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-coverage-${{ strategy.job-index }}
+          path: ${{ steps.backend-coverage-map.outputs.MAP_PATH }}
           retention-days: 1
 
       - name: Upload Dev Server Logs
@@ -124,13 +164,16 @@ jobs:
         with:
           name: dev-server-logs-${{ strategy.job-index }}
           path: dev-servers-${{ strategy.job-index }}.log
-          retention-days: 3
+          retention-days: 1
           if-no-files-found: ignore
 
   coverage-map-merge:
     needs: [init, coverage-tests]
     if: ${{ always() && needs.coverage-tests.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -141,34 +184,74 @@ jobs:
           path: artifacts
           merge-multiple: true
 
-      - name: Get Coverage Map Files
-        id: map-files
+      - name: Get Frontend Coverage Map Files
+        id: frontend-map-files
         run: |
-          JSON_FILES=$(find artifacts -name '*coverage-map.json' | sed 's/\.\///g' | tr '\n' ' ')
-          echo "json-files=$JSON_FILES" >> $GITHUB_OUTPUT
-          echo "Coverage maps: $JSON_FILES"
+          FRONTEND_FILES=$(find artifacts -name 'frontend-coverage-*-coverage-map.json' | sed 's/\.\///g' | tr '\n' ' ')
+          echo "json-files=$FRONTEND_FILES" >> $GITHUB_OUTPUT
+          echo "Frontend coverage maps: $FRONTEND_FILES"
 
-      - name: Merge Coverage Maps
-        if: ${{ steps.map-files.outputs.json-files != '' }}
+      - name: Get Backend Coverage Map Files
+        id: backend-map-files
+        run: |
+          BACKEND_FILES=$(find artifacts -name 'backend-coverage-*-node-coverage-map.json' | sed 's/\.\///g' | tr '\n' ' ')
+          echo "json-files=$BACKEND_FILES" >> $GITHUB_OUTPUT
+          echo "Backend coverage maps: $BACKEND_FILES"
+
+      - name: Merge Frontend Coverage Maps
+        if: ${{ steps.frontend-map-files.outputs.json-files != '' }}
         env:
-          JSON_FILES: ${{ steps.map-files.outputs.json-files }}
-          MERGED_REPORT_PATH: artifacts/coverage-map.json
+          JSON_FILES: ${{ steps.frontend-map-files.outputs.json-files }}
+          MERGED_REPORT_PATH: artifacts/frontend-coverage-map.json
         run: python .github/scripts/merge-coverage-map.py
 
-      - name: Upload Merged Coverage Map as Artifact
-        if: ${{ steps.map-files.outputs.json-files != '' }}
+      - name: Merge Backend Coverage Maps
+        if: ${{ steps.backend-map-files.outputs.json-files != '' }}
+        env:
+          JSON_FILES: ${{ steps.backend-map-files.outputs.json-files }}
+          MERGED_REPORT_PATH: artifacts/backend-coverage-map.json
+        run: python .github/scripts/merge-coverage-map.py
+
+      - name: Upload Merged Frontend Coverage Map
+        if: ${{ steps.frontend-map-files.outputs.json-files != '' }}
         uses: actions/upload-artifact@v7
         with:
-          name: merged-coverage-map
-          path: artifacts/coverage-map.json
+          name: merged-frontend-coverage-map
+          path: artifacts/frontend-coverage-map.json
           retention-days: 30
 
-      - name: Summary
-        if: ${{ steps.map-files.outputs.json-files != '' }}
+      - name: Upload Merged Backend Coverage Map
+        if: ${{ steps.backend-map-files.outputs.json-files != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: merged-backend-coverage-map
+          path: artifacts/backend-coverage-map.json
+          retention-days: 30
+
+      - name: Create Artifacts Directory
+        run: mkdir -p artifacts
+
+      - name: Copy Coverage Maps to Artifacts Folder
         run: |
-          echo "## Coverage Map Generation Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The merged coverage map has been uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifact Name:** merged-coverage-map" >> $GITHUB_STEP_SUMMARY
-          echo "**Retention:** 30 days" >> $GITHUB_STEP_SUMMARY
+          if [ -f "artifacts/frontend-coverage-map.json" ]; then
+            echo "Frontend coverage map ready for commit"
+          fi
+          if [ -f "artifacts/backend-coverage-map.json" ]; then
+            echo "Backend coverage map ready for commit"
+          fi
+
+      - name: Commit and Push Coverage Maps
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          echo "Adding coverage maps to git..."
+          git add artifacts/frontend-coverage-map.json artifacts/backend-coverage-map.json || true
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update coverage maps (frontend + backend)"
+            echo "Pushing to remote..."
+            git push
+          fi

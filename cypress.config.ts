@@ -49,7 +49,7 @@ export default defineConfig({
         viewportHeight: 1000,
         viewportWidth: 1280,
         env: {
-            apiUrl: 'http://localhost:3002',
+            apiUrl: 'http://localhost:3001',
             mobileViewportWidthBreakpoint: 414,
             coverage: false,
             codeCoverage: {

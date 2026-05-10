@@ -1,14 +1,14 @@
 {
     "baseUrl": "http://localhost:3000",
     "env": {
-        "apiUrl": "http://localhost:3002",
+        "apiUrl": "http://localhost:3001",
         "TAGS": "not @skip",
         "coverage": true,
         "mapCoverage": true,
         "mapNodeCoverage": true,
         "verboseFailures": true,
         "codeCoverage": {
-            "url": "http://localhost:3002/__coverage__",
+            "url": "http://localhost:3001/__coverage__",
             "exclude": "cypress/**/*.*"
         }
     }

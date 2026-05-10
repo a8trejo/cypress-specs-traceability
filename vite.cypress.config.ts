@@ -14,7 +14,7 @@ export default defineConfig(({ mode } = { mode: "development", command: "serve" 
          * so users can switch between CT and E2E testing without having to
          * stop/start the RWA dev server.
          */
-        port: 3002,
+        port: 3001,
       },
     })
   )

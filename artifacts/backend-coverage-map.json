@@ -1,0 +1,849 @@
+{
+    "app.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 63,
+            "likes a transaction": 1,
+            "comments on a transaction": 1,
+            "accepts a transaction request": 1,
+            "rejects a transaction request": 1,
+            "does not display accept/reject buttons on completed request": 1
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 62,
+            "should redirect to the home page after login": 1,
+            "should remember a user for 30 days after login": 2,
+            "should allow a visitor to sign-up, login, and logout": 2
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 1,
+            "should display bank account form errors": 1,
+            "soft deletes a bank account": 1,
+            "renders an empty bank account list state with onboarding modal": 1
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 63,
+            "should display user setting form errors": 1,
+            "updates first name, last name, email and phone number": 1
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 63,
+            "renders transactions item variations in feed": 1,
+            "paginates public transaction feed": 1,
+            "paginates contacts transaction feed": 1,
+            "paginates personal transaction feed": 1,
+            "filters public transaction feed by date range": 1,
+            "does not show public transactions for out of range date limits": 1,
+            "filters contacts transaction feed by date range": 1,
+            "does not show contacts transactions for out of range date limits": 1,
+            "filters personal transaction feed by date range": 1,
+            "does not show personal transactions for out of range date limits": 1,
+            "filters public transaction feed by amount range": 1,
+            "does not show public transactions for out of range amount limits": 1,
+            "filters contacts transaction feed by amount range": 1,
+            "does not show contacts transactions for out of range amount limits": 1,
+            "filters personal transaction feed by amount range": 1,
+            "does not show personal transactions for out of range amount limits": 1,
+            "mine feed only shows personal transactions": 1,
+            "first five items belong to contacts in public feed": 1,
+            "friends feed only shows contact transactions": 1
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 63,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 1,
+            "displays new transaction errors": 1,
+            "submits a transaction payment and verifies the deposit for the receiver": 2,
+            "submits a transaction request and accepts the request for the receiver": 2,
+            "firstName": 1,
+            "lastName": 1,
+            "username": 1,
+            "email": 1,
+            "phoneNumber": 1
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "renders an empty notifications state": 1,
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 2,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 2,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 2,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 2,
+            "User A sends a payment to User B": 2,
+            "User A sends a payment request to User C": 2
+        }
+    },
+    "auth.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 27,
+            "likes a transaction": 11,
+            "comments on a transaction": 11,
+            "accepts a transaction request": 11,
+            "rejects a transaction request": 11,
+            "does not display accept/reject buttons on completed request": 11
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 16,
+            "should redirect to the home page after login": 11,
+            "should remember a user for 30 days after login": 15,
+            "should allow a visitor to sign-up, login, and logout": 15,
+            "should error for an invalid user": 4,
+            "should error for an invalid password for existing user": 5
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 11,
+            "should display bank account form errors": 11,
+            "soft deletes a bank account": 11,
+            "renders an empty bank account list state with onboarding modal": 11
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 27,
+            "should display user setting form errors": 11,
+            "updates first name, last name, email and phone number": 11
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 27,
+            "renders transactions item variations in feed": 11,
+            "paginates public transaction feed": 11,
+            "paginates contacts transaction feed": 11,
+            "paginates personal transaction feed": 11,
+            "filters public transaction feed by date range": 11,
+            "does not show public transactions for out of range date limits": 11,
+            "filters contacts transaction feed by date range": 11,
+            "does not show contacts transactions for out of range date limits": 11,
+            "filters personal transaction feed by date range": 11,
+            "does not show personal transactions for out of range date limits": 11,
+            "filters public transaction feed by amount range": 11,
+            "does not show public transactions for out of range amount limits": 11,
+            "filters contacts transaction feed by amount range": 11,
+            "does not show contacts transactions for out of range amount limits": 11,
+            "filters personal transaction feed by amount range": 11,
+            "does not show personal transactions for out of range amount limits": 11,
+            "mine feed only shows personal transactions": 11,
+            "first five items belong to contacts in public feed": 11,
+            "friends feed only shows contact transactions": 11
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 27,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 11,
+            "displays new transaction errors": 11,
+            "submits a transaction payment and verifies the deposit for the receiver": 15,
+            "submits a transaction request and accepts the request for the receiver": 15,
+            "firstName": 11,
+            "lastName": 11,
+            "username": 11,
+            "email": 11,
+            "phoneNumber": 11
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "renders an empty notifications state": 11,
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 15,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 15,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 15,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 15,
+            "User A sends a payment to User B": 15,
+            "User A sends a payment request to User C": 15
+        }
+    },
+    "database.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 275,
+            "likes a transaction": 85,
+            "comments on a transaction": 85,
+            "accepts a transaction request": 94,
+            "rejects a transaction request": 94,
+            "does not display accept/reject buttons on completed request": 74
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 204,
+            "should redirect to the home page after login": 73,
+            "should remember a user for 30 days after login": 73,
+            "should allow a visitor to sign-up, login, and logout": 56,
+            "should display login errors": 3,
+            "should display signup errors": 3,
+            "should error for an invalid user": 6,
+            "should error for an invalid password for existing user": 7
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 80,
+            "should display bank account form errors": 73,
+            "soft deletes a bank account": 74,
+            "renders an empty bank account list state with onboarding modal": 73
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 274,
+            "should display user setting form errors": 73,
+            "updates first name, last name, email and phone number": 75
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 274,
+            "renders transactions item variations in feed": 73,
+            "paginates public transaction feed": 73,
+            "paginates contacts transaction feed": 73,
+            "paginates personal transaction feed": 73,
+            "filters public transaction feed by date range": 84,
+            "does not show public transactions for out of range date limits": 84,
+            "filters contacts transaction feed by date range": 81,
+            "does not show contacts transactions for out of range date limits": 81,
+            "filters personal transaction feed by date range": 81,
+            "does not show personal transactions for out of range date limits": 81,
+            "filters public transaction feed by amount range": 84,
+            "does not show public transactions for out of range amount limits": 84,
+            "filters contacts transaction feed by amount range": 81,
+            "does not show contacts transactions for out of range amount limits": 81,
+            "filters personal transaction feed by amount range": 81,
+            "does not show personal transactions for out of range amount limits": 81,
+            "mine feed only shows personal transactions": 73,
+            "first five items belong to contacts in public feed": 73,
+            "friends feed only shows contact transactions": 73
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 311,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 88,
+            "displays new transaction errors": 75,
+            "submits a transaction payment and verifies the deposit for the receiver": 103,
+            "submits a transaction request and accepts the request for the receiver": 105,
+            "firstName": 82,
+            "lastName": 82,
+            "username": 82,
+            "email": 82,
+            "phoneNumber": 82
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "renders an empty notifications state": 51,
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 88,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 85,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 85,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 85,
+            "User A sends a payment to User B": 103,
+            "User A sends a payment request to User C": 88
+        }
+    },
+    "src/utils/transactionUtils.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 85,
+            "likes a transaction": 13,
+            "comments on a transaction": 13,
+            "accepts a transaction request": 18,
+            "rejects a transaction request": 18,
+            "does not display accept/reject buttons on completed request": 13
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 72,
+            "should redirect to the home page after login": 9,
+            "should remember a user for 30 days after login": 9,
+            "should allow a visitor to sign-up, login, and logout": 6
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 9,
+            "should display bank account form errors": 9,
+            "soft deletes a bank account": 9,
+            "renders an empty bank account list state with onboarding modal": 9
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 81,
+            "should display user setting form errors": 9,
+            "updates first name, last name, email and phone number": 9
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 81,
+            "renders transactions item variations in feed": 9,
+            "paginates public transaction feed": 9,
+            "paginates contacts transaction feed": 13,
+            "paginates personal transaction feed": 13,
+            "filters public transaction feed by date range": 15,
+            "does not show public transactions for out of range date limits": 15,
+            "filters contacts transaction feed by date range": 15,
+            "does not show contacts transactions for out of range date limits": 15,
+            "filters personal transaction feed by date range": 15,
+            "does not show personal transactions for out of range date limits": 15,
+            "filters public transaction feed by amount range": 15,
+            "does not show public transactions for out of range amount limits": 15,
+            "filters contacts transaction feed by amount range": 15,
+            "does not show contacts transactions for out of range amount limits": 15,
+            "filters personal transaction feed by amount range": 15,
+            "does not show personal transactions for out of range amount limits": 15,
+            "mine feed only shows personal transactions": 13,
+            "first five items belong to contacts in public feed": 9,
+            "friends feed only shows contact transactions": 13
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 90,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 13,
+            "displays new transaction errors": 9,
+            "submits a transaction payment and verifies the deposit for the receiver": 14,
+            "submits a transaction request and accepts the request for the receiver": 18,
+            "firstName": 9,
+            "lastName": 9,
+            "username": 9,
+            "email": 9,
+            "phoneNumber": 9
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "renders an empty notifications state": 6,
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 9,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 9,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 9,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 9,
+            "User A sends a payment to User B": 14,
+            "User A sends a payment request to User C": 9
+        }
+    },
+    "user-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 16
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 16,
+            "should allow a visitor to sign-up, login, and logout": 4
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 16,
+            "updates first name, last name, email and phone number": 4
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 16
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 19,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 1,
+            "displays new transaction errors": 1,
+            "submits a transaction payment and verifies the deposit for the receiver": 1,
+            "submits a transaction request and accepts the request for the receiver": 1,
+            "firstName": 3,
+            "lastName": 3,
+            "username": 3,
+            "email": 3,
+            "phoneNumber": 3
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "User A sends a payment to User B": 1,
+            "User A sends a payment request to User C": 1
+        }
+    },
+    "helpers.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 35,
+            "likes a transaction": 8,
+            "comments on a transaction": 8,
+            "accepts a transaction request": 8,
+            "rejects a transaction request": 8,
+            "does not display accept/reject buttons on completed request": 8
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 27,
+            "should redirect to the home page after login": 8,
+            "should remember a user for 30 days after login": 8,
+            "should allow a visitor to sign-up, login, and logout": 8,
+            "should error for an invalid password for existing user": 5
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 8,
+            "should display bank account form errors": 8,
+            "soft deletes a bank account": 8,
+            "renders an empty bank account list state with onboarding modal": 8
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 35,
+            "should display user setting form errors": 8,
+            "updates first name, last name, email and phone number": 8
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 35,
+            "renders transactions item variations in feed": 8,
+            "paginates public transaction feed": 8,
+            "paginates contacts transaction feed": 8,
+            "paginates personal transaction feed": 8,
+            "filters public transaction feed by date range": 8,
+            "does not show public transactions for out of range date limits": 8,
+            "filters contacts transaction feed by date range": 8,
+            "does not show contacts transactions for out of range date limits": 8,
+            "filters personal transaction feed by date range": 8,
+            "does not show personal transactions for out of range date limits": 8,
+            "filters public transaction feed by amount range": 8,
+            "does not show public transactions for out of range amount limits": 8,
+            "filters contacts transaction feed by amount range": 8,
+            "does not show contacts transactions for out of range amount limits": 8,
+            "filters personal transaction feed by amount range": 8,
+            "does not show personal transactions for out of range amount limits": 8,
+            "mine feed only shows personal transactions": 8,
+            "first five items belong to contacts in public feed": 8,
+            "friends feed only shows contact transactions": 8
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 35,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 8,
+            "displays new transaction errors": 8,
+            "submits a transaction payment and verifies the deposit for the receiver": 8,
+            "submits a transaction request and accepts the request for the receiver": 8,
+            "firstName": 8,
+            "lastName": 8,
+            "username": 8,
+            "email": 8,
+            "phoneNumber": 8
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "renders an empty notifications state": 8,
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 8,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 8,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 8,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 8,
+            "User A sends a payment to User B": 8,
+            "User A sends a payment request to User C": 8
+        }
+    },
+    "src/aws-exports.js": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 3
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 3
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 3
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 3
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 3
+        }
+    },
+    "validators.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 33,
+            "likes a transaction": 5,
+            "comments on a transaction": 5,
+            "accepts a transaction request": 5,
+            "rejects a transaction request": 5,
+            "does not display accept/reject buttons on completed request": 5
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 28
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 28,
+            "updates first name, last name, email and phone number": 1
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 28,
+            "paginates contacts transaction feed": 4,
+            "paginates personal transaction feed": 4,
+            "filters contacts transaction feed by date range": 4,
+            "does not show contacts transactions for out of range date limits": 4,
+            "filters personal transaction feed by date range": 4,
+            "does not show personal transactions for out of range date limits": 4,
+            "filters contacts transaction feed by amount range": 4,
+            "does not show contacts transactions for out of range amount limits": 4,
+            "filters personal transaction feed by amount range": 4,
+            "does not show personal transactions for out of range amount limits": 4,
+            "mine feed only shows personal transactions": 4,
+            "friends feed only shows contact transactions": 4
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 32,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 4,
+            "submits a transaction request and accepts the request for the receiver": 5
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 1,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 1,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 1,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 1
+        }
+    },
+    "contact-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 12
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 12
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 12
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 12
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 12
+        }
+    },
+    "bankaccount-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 13
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 13
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 13
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 13
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 13
+        }
+    },
+    "gql-playground-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 8
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 8
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 8
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 8
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 8
+        }
+    },
+    "transaction-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 32,
+            "likes a transaction": 15,
+            "comments on a transaction": 15,
+            "accepts a transaction request": 17,
+            "rejects a transaction request": 17,
+            "does not display accept/reject buttons on completed request": 15
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 17,
+            "should redirect to the home page after login": 8,
+            "should remember a user for 30 days after login": 8,
+            "should allow a visitor to sign-up, login, and logout": 8
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 8,
+            "should display bank account form errors": 8,
+            "soft deletes a bank account": 8,
+            "renders an empty bank account list state with onboarding modal": 8
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 25,
+            "should display user setting form errors": 8,
+            "updates first name, last name, email and phone number": 8
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 25,
+            "renders transactions item variations in feed": 8,
+            "paginates public transaction feed": 8,
+            "paginates contacts transaction feed": 11,
+            "paginates personal transaction feed": 11,
+            "filters public transaction feed by date range": 8,
+            "does not show public transactions for out of range date limits": 8,
+            "filters contacts transaction feed by date range": 11,
+            "does not show contacts transactions for out of range date limits": 11,
+            "filters personal transaction feed by date range": 11,
+            "does not show personal transactions for out of range date limits": 11,
+            "filters public transaction feed by amount range": 8,
+            "does not show public transactions for out of range amount limits": 8,
+            "filters contacts transaction feed by amount range": 11,
+            "does not show contacts transactions for out of range amount limits": 11,
+            "filters personal transaction feed by amount range": 11,
+            "does not show personal transactions for out of range amount limits": 11,
+            "mine feed only shows personal transactions": 11,
+            "first five items belong to contacts in public feed": 8,
+            "friends feed only shows contact transactions": 11
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 33,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 16,
+            "displays new transaction errors": 8,
+            "submits a transaction payment and verifies the deposit for the receiver": 13,
+            "submits a transaction request and accepts the request for the receiver": 22,
+            "firstName": 8,
+            "lastName": 8,
+            "username": 8,
+            "email": 8,
+            "phoneNumber": 8
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "renders an empty notifications state": 8,
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 12,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 12,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 12,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 12,
+            "User A sends a payment to User B": 13,
+            "User A sends a payment request to User C": 13
+        }
+    },
+    "like-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 11,
+            "likes a transaction": 2
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 11
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 11
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 11
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 11
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 2,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 2
+        }
+    },
+    "comment-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 11,
+            "comments on a transaction": 3
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 11
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 11
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 11
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 11
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 3,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 3
+        }
+    },
+    "notification-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 14,
+            "likes a transaction": 2,
+            "comments on a transaction": 2,
+            "accepts a transaction request": 2,
+            "rejects a transaction request": 2,
+            "does not display accept/reject buttons on completed request": 2
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 12,
+            "should redirect to the home page after login": 2,
+            "should remember a user for 30 days after login": 2,
+            "should allow a visitor to sign-up, login, and logout": 2
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 2,
+            "should display bank account form errors": 2,
+            "soft deletes a bank account": 2,
+            "renders an empty bank account list state with onboarding modal": 2
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 14,
+            "should display user setting form errors": 2,
+            "updates first name, last name, email and phone number": 2
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 14,
+            "renders transactions item variations in feed": 2,
+            "paginates public transaction feed": 2,
+            "paginates contacts transaction feed": 2,
+            "paginates personal transaction feed": 2,
+            "filters public transaction feed by date range": 2,
+            "does not show public transactions for out of range date limits": 2,
+            "filters contacts transaction feed by date range": 2,
+            "does not show contacts transactions for out of range date limits": 2,
+            "filters personal transaction feed by date range": 2,
+            "does not show personal transactions for out of range date limits": 2,
+            "filters public transaction feed by amount range": 2,
+            "does not show public transactions for out of range amount limits": 2,
+            "filters contacts transaction feed by amount range": 2,
+            "does not show contacts transactions for out of range amount limits": 2,
+            "filters personal transaction feed by amount range": 2,
+            "does not show personal transactions for out of range amount limits": 2,
+            "mine feed only shows personal transactions": 2,
+            "first five items belong to contacts in public feed": 2,
+            "friends feed only shows contact transactions": 2
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 14,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 2,
+            "displays new transaction errors": 2,
+            "submits a transaction payment and verifies the deposit for the receiver": 2,
+            "submits a transaction request and accepts the request for the receiver": 2,
+            "firstName": 2,
+            "lastName": 2,
+            "username": 2,
+            "email": 2,
+            "phoneNumber": 2
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 4,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 2,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 2,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 2,
+            "User A sends a payment to User B": 2,
+            "User A sends a payment request to User C": 2
+        }
+    },
+    "banktransfer-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 9
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 9
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 9
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 9
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 9
+        }
+    },
+    "testdata-routes.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 17,
+            "likes a transaction": 6,
+            "comments on a transaction": 6,
+            "accepts a transaction request": 6,
+            "rejects a transaction request": 6,
+            "does not display accept/reject buttons on completed request": 6
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 13,
+            "should redirect to the home page after login": 6,
+            "should remember a user for 30 days after login": 6,
+            "should allow a visitor to sign-up, login, and logout": 2,
+            "should display login errors": 2,
+            "should display signup errors": 2,
+            "should error for an invalid user": 2,
+            "should error for an invalid password for existing user": 6
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 6,
+            "should display bank account form errors": 6,
+            "soft deletes a bank account": 6,
+            "renders an empty bank account list state with onboarding modal": 6
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 17,
+            "should display user setting form errors": 6,
+            "updates first name, last name, email and phone number": 6
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 17,
+            "renders transactions item variations in feed": 6,
+            "paginates public transaction feed": 6,
+            "paginates contacts transaction feed": 6,
+            "paginates personal transaction feed": 6,
+            "filters public transaction feed by date range": 6,
+            "does not show public transactions for out of range date limits": 6,
+            "filters contacts transaction feed by date range": 6,
+            "does not show contacts transactions for out of range date limits": 6,
+            "filters personal transaction feed by date range": 6,
+            "does not show personal transactions for out of range date limits": 6,
+            "filters public transaction feed by amount range": 6,
+            "does not show public transactions for out of range amount limits": 6,
+            "filters contacts transaction feed by amount range": 6,
+            "does not show contacts transactions for out of range amount limits": 6,
+            "filters personal transaction feed by amount range": 6,
+            "does not show personal transactions for out of range amount limits": 6,
+            "mine feed only shows personal transactions": 6,
+            "first five items belong to contacts in public feed": 6,
+            "friends feed only shows contact transactions": 6
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 17,
+            "navigates to the new transaction form, selects a user and submits a transaction request": 6,
+            "displays new transaction errors": 6,
+            "submits a transaction payment and verifies the deposit for the receiver": 6,
+            "submits a transaction request and accepts the request for the receiver": 6,
+            "firstName": 6,
+            "lastName": 6,
+            "username": 6,
+            "email": 6,
+            "phoneNumber": 6
+        },
+        "cypress/src/ui/notifications.spec.ts": {
+            "renders an empty notifications state": 6,
+            "User A likes a transaction of User B; User B gets notification that User A liked transaction ": 6,
+            "User C likes a transaction between User A and User B; User A and User B get notifications that User C liked transaction": 6,
+            "User A comments on a transaction of User B; User B gets notification that User A commented on their transaction": 6,
+            "User C comments on a transaction between User A and User B; User A and B get notifications that User C commented on their transaction": 6,
+            "User A sends a payment to User B": 6,
+            "User A sends a payment request to User C": 6
+        }
+    },
+    "graphql/resolvers/index.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 7
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 7
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 7
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 7
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 7
+        }
+    },
+    "graphql/resolvers/Query.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 4
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 4
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 4
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 4
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 4
+        }
+    },
+    "graphql/resolvers/Mutation.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 4
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 4,
+            "should allow a visitor to sign-up, login, and logout": 1
+        },
+        "cypress/src/ui/bankaccounts.spec.ts": {
+            "creates a new bank account": 1,
+            "soft deletes a bank account": 2
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 4
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 4
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 4
+        }
+    },
+    "src/utils/portUtils.ts": {
+        "cypress/src/ui/transaction-view.spec.ts": {
+            "transactions navigation tabs are hidden on a transaction view page": 14
+        },
+        "cypress/src/ui/auth.spec.ts": {
+            "should redirect unauthenticated user to signin page": 14
+        },
+        "cypress/src/ui/user-settings.spec.ts": {
+            "renders the user settings form": 14
+        },
+        "cypress/src/ui/transaction-feeds.spec.ts": {
+            "toggles the navigation drawer": 14
+        },
+        "cypress/src/ui/new-transaction.spec.ts": {
+            "navigates to the new transaction form, selects a user and submits a transaction payment": 14
+        }
+    }
+}
