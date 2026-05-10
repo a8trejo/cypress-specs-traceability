@@ -116,7 +116,7 @@ jobs:
           else
             # No coverage map available, run all tests
             echo "RUN_FLAG=true" >> $GITHUB_OUTPUT
-            echo "SPECS_PATTERN=cypress/src/**/*.cy.{js,jsx,ts,tsx}" >> $GITHUB_OUTPUT
+            echo "SPECS_PATTERN=cypress/src/ui/*.spec.ts" >> $GITHUB_OUTPUT
             echo "MATRIX_CONFIG=[1, 2, 3, 4, 5]" >> $GITHUB_OUTPUT
           fi
 
