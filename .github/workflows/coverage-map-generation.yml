@@ -141,7 +141,7 @@ jobs:
         with:
           name: dev-server-logs-${{ strategy.job-index }}
           path: dev-servers-${{ strategy.job-index }}.log
-          retention-days: 3
+          retention-days: 1
           if-no-files-found: ignore
 
   coverage-map-merge:
@@ -181,7 +181,7 @@ jobs:
         with:
           name: merged-coverage-map
           path: artifacts/coverage-map.json
-          retention-days: 30
+          retention-days: 1
 
       # Commit and push changelog updates
       - name: Push Coverage Map

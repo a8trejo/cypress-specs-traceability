@@ -29,6 +29,12 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+
       # Caches ~/.cache/Cypress and ~/.npm
       - name: NPM install
         uses: cypress-io/github-action@v7
@@ -152,10 +158,11 @@ jobs:
           node-version: '24'
           cache: 'npm'
 
-      - name: Install Dependencies
-        run: |
-          npm ci
-          npm install -D cypress-split cypress-on-fix
+      - name: Setup Mock AWS Exports
+        run: npm run predev:cognito:ci
+
+      - name: Seed Database
+        run: npm run db:seed:dev
 
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v2
@@ -176,14 +183,22 @@ jobs:
           chrome --version
           echo "--------------"
 
+      - name: Start Dev Servers
+        run: |
+          npm run dev:coverage >> dev-servers-${{ strategy.job-index }}.log 2>&1 &
+          npx wait-on http://localhost:3000/signin -t 120000
+          echo 'http://localhost:3000/signin is up and running!'
+          npx wait-on http://localhost:3001 -t 120000
+          echo 'http://localhost:3001 is up and running!'
+        env:
+          NODE_ENV: development
+          CYPRESS_COVERAGE: true
+
       - name: Cypress Regression Tests
         uses: cypress-io/github-action@v7
         timeout-minutes: 20
         with:
           build: npx cypress info
-          start: npm run dev:coverage
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
           config: numTestsKeptInMemory=0
           install: false
           browser: chrome
@@ -192,8 +207,24 @@ jobs:
           TZ: America/Los_Angeles
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_OPTIONS: '--max-old-space-size=4096'
+          SPEC: ${{ needs.init.outputs.SPECS_PATTERN }}
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
+
+      - name: Output Dev Server Logs
+        if: always()
+        run: |
+          echo "========== Dev Server Logs =========="
+          cat dev-servers-${{ strategy.job-index }}.log || echo "No dev server logs found"
+
+      - name: Upload Dev Server Logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dev-server-logs-${{ strategy.job-index }}
+          path: dev-servers-${{ strategy.job-index }}.log
+          retention-days: 1
+          if-no-files-found: ignore
 
       - name: Persist Test Artifacts
         if: failure()
@@ -212,6 +243,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      # TODO: Use AI CLI to pass failure analysis
       - name: Check Test Results
         run: |
           echo "## Cypress Test Results" >> $GITHUB_STEP_SUMMARY
