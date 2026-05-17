@@ -1,5 +1,5 @@
-name: Coverage Map Generation 📊
-run-name: Coverage Map Generation 📊
+name: Coverage Map Generation 📝
+run-name: Coverage Map Generation 📝
 
 on:
   workflow_dispatch:
