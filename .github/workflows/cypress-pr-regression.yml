@@ -1,5 +1,5 @@
-name: Cypress PR Regression 🤖
-run-name: cypress-pr-regression 🤖 - PR#${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
+name: Cypress PR Test 🤖
+run-name: cypress-pr-test 🤖 - PR#${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
 
 on:
   pull_request:

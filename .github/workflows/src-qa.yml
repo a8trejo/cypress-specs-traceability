@@ -1,5 +1,5 @@
 name: Src QA 🔎
-run-name: src-QA 🔎 - PR#${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
+run-name: src-qa 🔎 - PR#${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
 on:
   workflow_dispatch:
   pull_request:
