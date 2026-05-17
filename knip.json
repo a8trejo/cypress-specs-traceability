@@ -51,6 +51,8 @@
       "uuid",
       "webpack",
       "xstate",
-      "yup"
+      "yup",
+      "@emotion/react",
+      "@emotion/styled"
     ]
 }
