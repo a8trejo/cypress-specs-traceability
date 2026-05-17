@@ -225,7 +225,7 @@
     "jsdom": "^22.1.0",
     "json": "11.0.0",
     "jwks-rsa": "2.0.5",
-    "knip": "^6.4.1",
+    "knip": "^6.14.1",
     "lint-staged": "^15.5.0",
     "lodash": "^4.17.21",
     "lowdb": "1.0.0",
@@ -244,7 +244,7 @@
     "sort-package-json": "^3.0.0",
     "start-server-and-test": "1.14.0",
     "ts-node": "10.9.2",
-    "typescript": "5.8.3",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.1.3",
     "vite-plugin-eslint": "^1.8.1",
@@ -254,24 +254,6 @@
   },
   "engines": {
     "node": "^20.0.0 || ^22.0.0 || ^24.0.0"
-  },
-  "knip": {
-    "entry": [
-      "cypress.config.ts",
-      "cypress/src/**/*.{spec,cy}.{js,jsx,ts,tsx}",
-      "cypress/support/e2e.ts",
-      "cypress/support/component.ts"
-    ],
-    "project": [
-      "cypress/**/*.ts",
-      "config-utils.ts",
-      "cypress/support/utils/*.ts"
-    ],
-    "ignoreDependencies": [
-      "mysql",
-      "cypress",
-      "cypress-plugin-api"
-    ]
   },
   "percy": {
     "version": 1,

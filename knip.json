@@ -1,0 +1,56 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "tags": [
+    "-lintignore"
+  ],
+  "entry": [
+      "cypress.config.ts",
+      "cypress/src/**/*.{spec,cy}.{js,jsx,ts,tsx}",
+      "cypress/support/e2e.ts",
+      "cypress/support/component.ts"
+    ],
+    "project": [
+      "cypress/**/*.ts",
+      "config-utils.ts",
+      "cypress/support/utils/*.ts"
+    ],
+    "ignoreDependencies": [
+      "mysql",
+      "cypress",
+      "cypress-plugin-api",
+      "@auth0/auth0-react",
+      "@babel/core",
+      "@babel/plugin-syntax-flow",
+      "@babel/plugin-transform-react-jsx",
+      "@graphql-tools/graphql-file-loader",
+      "@graphql-tools/load",
+      "@matheusluizn/react-google-login",
+      "@mui/icons-material",
+      "@mui/lab",
+      "@okta/jwt-verifier",
+      "@okta/okta-auth-js",
+      "@okta/okta-react",
+      "@types/detect-port",
+      "@xstate/react",
+      "aws-amplify",
+      "axios",
+      "chalk",
+      "clsx",
+      "date-fns",
+      "date-fns-tz",
+      "detect-port",
+      "dinero.js",
+      "formik",
+      "history",
+      "postinstall-postinstall",
+      "react-calendar",
+      "react-number-format",
+      "react-router",
+      "react-virtualized",
+      "shortid",
+      "uuid",
+      "webpack",
+      "xstate",
+      "yup"
+    ]
+}
