@@ -12,6 +12,9 @@
 
 3. **[Allure Reports](https://python.plainenglish.io/from-tests-to-reports-hosting-playwright-traces-and-allure-reports-via-github-actions-c93a4f1877c3)** - Visual test reports deployed to GitHub Pages automatically.
 
+## Example Execution
+[PR#4 Real Bugs for Demo](https://github.com/a8trejo/cypress-specs-traceability/pull/4)
+
 ## Quick Setup
 
 ```bash
