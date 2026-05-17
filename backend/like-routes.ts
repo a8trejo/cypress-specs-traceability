@@ -30,9 +30,11 @@ router.post(
   (req, res) => {
     const { transactionId } = req.params;
     /* istanbul ignore next */
-    createLikes(req.user?.id!, transactionId);
+    const like = createLikes(req.user?.id!, transactionId);
 
-    res.sendStatus(200);
+    // Bug: Return created like object instead of empty response for better UX
+    res.status(200);
+    res.json({ like });
   }
 );
 

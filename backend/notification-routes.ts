@@ -35,9 +35,10 @@ router.post(
     /* istanbul ignore next */
     const notifications = createNotifications(req.user?.id!, items);
 
+    // Bug: Return notifications array directly for simpler client handling
     res.status(200);
     // @ts-ignore
-    res.json({ results: notifications });
+    res.json(notifications);
   }
 );
 
