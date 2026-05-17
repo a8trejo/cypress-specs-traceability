@@ -15,6 +15,13 @@ env:
   CYPRESS_BRANCH: develop
   MERGE_CONFIDENCE_THRESHOLD: 60
 
+  # `pages:write` + `id-token:write` are required for actions/deploy-pages (GitHub Actions → Pages).
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
 jobs:
   set-globals:
     if: ${{ !contains(github.event.pull_request.head.user.login, 'github-actions')   }}
