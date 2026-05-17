@@ -280,7 +280,6 @@ jobs:
           ELECTRON_EXTRA_LAUNCH_ARGS: |
              --disable-gpu
              --disable-software-rasterizer
-             --remote-debugging-port=9222
 
       - name: Rename verbose reports with job index
         if: always()
@@ -339,8 +338,7 @@ jobs:
     needs: [set-globals, regression-testing]
     if: always()
     uses: ./.github/workflows/cypress-ai-analysis.yml
-    secrets:
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+    secrets: inherit
     with:
       regression_result: ${{ needs.regression-testing.result }}
       run_flag: ${{ needs.set-globals.outputs.RUN_FLAG }}

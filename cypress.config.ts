@@ -251,7 +251,7 @@ async function setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginC
 
     codeCoverageTask(on, config)
     cypressSplit(on, config)
-    
+
     // Allure Cypress reporter
     // Configure with proper paths to avoid ENOENT errors with screenshots
     allureCypress(on, config, {
@@ -259,7 +259,7 @@ async function setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginC
         // Disable automatic screenshot/video attachment to prevent path conflicts
         videoOnFailOnly: false,
     } as any)
-    
+
     config = configUtils.getConfigByFile(envKey, config)
     return config
 }

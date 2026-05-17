@@ -25,10 +25,6 @@ on:
         description: 'Pull request head SHA'
         required: true
         type: string
-    secrets:
-      OPENROUTER_API_KEY:
-        description: 'OpenRouter API key for Kilo CLI'
-        required: true
 
 jobs:
   analyze-failures:
