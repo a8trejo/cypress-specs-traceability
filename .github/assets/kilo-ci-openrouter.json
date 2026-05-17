@@ -1,0 +1,21 @@
+{
+  "model": "{env:MODEL_NAME}",
+  "provider": {
+    "openrouter": {
+      "options": {
+        "apiKey": "{env:OPENROUTER_API_KEY}"
+      }
+    }
+  },
+  "permission": {
+    "bash": {
+      "*": "allow",
+      "git *": "deny",
+      "npm *": "deny",
+      "rm *": "deny"
+    },
+    "edit": {
+      "*": "allow"
+    }
+  }
+}
