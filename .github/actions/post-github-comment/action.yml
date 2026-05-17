@@ -1,0 +1,65 @@
+name: 'Post Github Comment'
+description: 'Post or update a Github comment on PR or Issue'
+
+inputs:
+  github_token:
+    description: 'Github API Token'
+    required: true
+  body_includes:
+    description: 'Text to match the PR comment'
+    required: true
+  issue_number:
+    description: 'Github ID (PR or Issue number)'
+    required: true
+  delete_and_repost:
+    description: 'Delete and repost comment'
+    default: 'true'
+    required: false
+  comment_body:
+    description: 'Body content of the comment'
+    required: true
+  resolved:
+    description: 'If true and comment exists, delete it without creating a new one'
+    default: 'false'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Find existing analysis comment
+      uses: peter-evans/find-comment@v3
+      id: find-comment
+      with:
+        token: ${{ inputs.github_token }}
+        issue-number: ${{ inputs.issue_number }}
+        body-includes: ${{ inputs.body_includes }}
+
+    - name: Delete existing comment
+      if: ${{ (inputs.resolved == 'true' && steps.find-comment.outputs.comment-id != '') || (inputs.delete_and_repost == 'true' && steps.find-comment.outputs.comment-id != '') }}
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const commentId = '${{ steps.find-comment.outputs.comment-id }}';
+          await github.rest.issues.deleteComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: commentId
+          });
+
+    - name: Create new comment
+      if: ${{ inputs.resolved != 'true' && (inputs.delete_and_repost == 'true' || steps.find-comment.outputs.comment-id == '') }}
+      uses: peter-evans/create-or-update-comment@v5
+      with:
+        token: ${{ inputs.github_token }}
+        issue-number: ${{ inputs.issue_number }}
+        body: ${{ inputs.comment_body }}
+
+    - name: Replace existing comment
+      if: ${{ inputs.resolved != 'true' && inputs.delete_and_repost != 'true' && steps.find-comment.outputs.comment-id != '' }}
+      uses: peter-evans/create-or-update-comment@v5
+      with:
+        token: ${{ inputs.github_token }}
+        issue-number: ${{ inputs.issue_number }}
+        body: ${{ inputs.comment_body }}
+        comment-id: ${{ steps.find-comment.outputs.comment-id }}

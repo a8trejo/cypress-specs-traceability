@@ -1,5 +1,6 @@
 // @ts-check
 import '@cypress/code-coverage/support'
+import 'allure-cypress'
 import './commands'
 import { isMobile } from './utils'
 

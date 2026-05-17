@@ -1,0 +1,8 @@
+# Allure Report 3 — https://allurereport.org/docs/
+name: Cypress Specs Traceability
+output: ./cypress/results/reports/allure-report
+plugins:
+  awesome:
+    options:
+      # Single-file HTML simplifies CI artifacts / GitHub Pages uploads
+      singleFile: true

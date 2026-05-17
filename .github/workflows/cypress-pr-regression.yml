@@ -13,9 +13,10 @@ concurrency:
 env:
   SPECS_PER_CONTAINER: 4
   CYPRESS_BRANCH: develop
+  MERGE_CONFIDENCE_THRESHOLD: 60
 
 jobs:
-  init:
+  set-globals:
     if: ${{ !contains(github.event.pull_request.head.user.login, 'github-actions')   }}
     runs-on: ubuntu-latest
     outputs:
@@ -201,14 +202,14 @@ jobs:
           echo "version=$CHROME_VERSION" >> $GITHUB_OUTPUT
 
   regression-testing:
-    needs: [init]
-    if: ${{ needs.init.outputs.RUN_FLAG == 'true' }}
+    needs: [set-globals]
+    if: ${{ needs.set-globals.outputs.RUN_FLAG == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        containers: ${{ fromJson(needs.init.outputs.MATRIX_CONFIG) }}
+        containers: ${{ fromJson(needs.set-globals.outputs.MATRIX_CONFIG) }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -233,7 +234,7 @@ jobs:
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v2
         with:
-          chrome-version: ${{ needs.init.outputs.chrome_version }}
+          chrome-version: ${{ needs.set-globals.outputs.chrome_version }}
 
       - name: Chrome Symlink
         id: chrome-symlink
@@ -268,14 +269,29 @@ jobs:
           config: numTestsKeptInMemory=0
           install: false
           browser: chrome
-          spec: ${{ needs.init.outputs.SPECS_PATTERN }}
+          spec: ${{ needs.set-globals.outputs.SPECS_PATTERN }}
         env:
           TZ: America/Los_Angeles
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_OPTIONS: '--max-old-space-size=4096'
-          SPEC: ${{ needs.init.outputs.SPECS_PATTERN }}
+          SPEC: ${{ needs.set-globals.outputs.SPECS_PATTERN }}
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
+          ELECTRON_EXTRA_LAUNCH_ARGS: |
+             --disable-gpu
+             --disable-software-rasterizer
+             --remote-debugging-port=9222
+
+      - name: Rename verbose reports with job index
+        if: always()
+        run: |
+          # Rename verbose metadata file with job index
+          if [ -f cypress/results/reports/verbose/verbose-metadata.json ]; then
+            mv cypress/results/reports/verbose/verbose-metadata.json cypress/results/reports/verbose/verbose-metadata-${{ strategy.job-index }}.json
+            echo "Renamed verbose-metadata.json to verbose-metadata-${{ strategy.job-index }}.json"
+          else
+            echo "verbose-metadata.json not found, skipping rename"
+          fi
 
       - name: Output Dev Server Logs
         if: always()
@@ -293,34 +309,41 @@ jobs:
           if-no-files-found: ignore
 
       - name: Persist Test Artifacts
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: cypress-artifacts-${{ strategy.job-index }}
           path: |
             cypress/screenshots
             cypress/videos
+            cypress/results/reports/verbose
+            cypress/results/allure-results
           retention-days: 3
           if-no-files-found: ignore
 
+  # Generate and deploy Allure report to GitHub Pages
+  allure-report:
+    name: Allure Report
+    needs: [set-globals, regression-testing]
+    if: always() && needs.set-globals.outputs.RUN_FLAG == 'true'
+    uses: ./.github/workflows/allure-gh-pages.yml
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_sha: ${{ github.event.pull_request.head.sha }}
+      run_id: ${{ github.run_id }}
+      deployment_type: 'pr'
+
+  # Call reusable workflow for AI analysis
   cypress-results:
     name: Cypress Results
-    needs: [init, regression-testing]
+    needs: [set-globals, regression-testing]
     if: always()
-    runs-on: ubuntu-latest
-    steps:
-      # TODO: Use AI CLI to pass failure analysis
-      - name: Check Test Results
-        run: |
-          echo "## Cypress Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [[ "${{ needs.regression-testing.result }}" == "success" ]]; then
-            echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
-            echo "✅ Cypress tests passed"
-            exit 0
-          else
-            echo "❌ Tests failed. Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
-            echo "::error ::Cypress tests failed"
-            exit 1
-          fi
+    uses: ./.github/workflows/cypress-ai-analysis.yml
+    secrets:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+    with:
+      regression_result: ${{ needs.regression-testing.result }}
+      run_flag: ${{ needs.set-globals.outputs.RUN_FLAG }}
+      merge_confidence_threshold: 60
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_sha: ${{ github.event.pull_request.head.sha }}

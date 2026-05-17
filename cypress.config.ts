@@ -1,10 +1,10 @@
 import { defineConfig } from 'cypress'
 import fs from 'fs-extra'
-import type { Browser as PuppeteerBrowser } from 'puppeteer-core'
 import { setup, retry } from '@cypress/puppeteer'
 import configUtils from './config-utils.js'
 import codeCoverageTask from '@cypress/code-coverage/task'
 import cypressSplit from 'cypress-split'
+import { allureCypress } from 'allure-cypress/reporter'
 import path from 'path'
 import _ from 'lodash'
 import axios from 'axios'
@@ -83,7 +83,7 @@ export default defineConfig({
             nodeCoverageMapPath: 'cypress/results/reports/coverage-map/node-coverage-map.json',
 
             // Verbose failures
-            verboseFailures: process.env.VERBOSE_FAILURES === 'true' || false,
+            verboseFailures: false,
         },
         setupNodeEvents,
     },
@@ -251,6 +251,15 @@ async function setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginC
 
     codeCoverageTask(on, config)
     cypressSplit(on, config)
+    
+    // Allure Cypress reporter
+    // Configure with proper paths to avoid ENOENT errors with screenshots
+    allureCypress(on, config, {
+        resultsDir: 'cypress/results/reports/allure-results',
+        // Disable automatic screenshot/video attachment to prevent path conflicts
+        videoOnFailOnly: false,
+    } as any)
+    
     config = configUtils.getConfigByFile(envKey, config)
     return config
 }
