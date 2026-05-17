@@ -1,4 +1,5 @@
 name: Generate and Deploy Allure Report to GitHub Pages
+run-name: allure-gh-pages
 # Reusable workflow for generating Allure reports and deploying to GitHub Pages
 
 on:
@@ -50,7 +51,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           pattern: cypress-artifacts-*
-          path: cypress/results
+          path: cypress
           merge-multiple: true
 
       - name: Install Allure CLI

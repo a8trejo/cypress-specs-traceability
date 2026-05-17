@@ -1,4 +1,5 @@
 name: Cypress AI Analysis
+run-name: ai-analysis
 # Reusable workflow for analyzing Cypress test failures with Kilo CLI
 
 on:
