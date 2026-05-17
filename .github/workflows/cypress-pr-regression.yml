@@ -187,7 +187,7 @@ jobs:
             # No coverage map available, run all tests
             echo "RUN_FLAG=true" >> $GITHUB_OUTPUT
             echo "SPECS_PATTERN=cypress/src/ui/*.spec.ts" >> $GITHUB_OUTPUT
-            echo "MATRIX_CONFIG=[1, 2, 3, 4, 5]" >> $GITHUB_OUTPUT
+            echo "MATRIX_CONFIG=[1, 2, 3, 4]" >> $GITHUB_OUTPUT
           fi
 
       - name: Echo Cypress Strategy Config
@@ -323,7 +323,7 @@ jobs:
             cypress/screenshots
             cypress/videos
             cypress/results/reports/verbose
-            cypress/results/allure-results
+            cypress/results/reports/allure-results
           retention-days: 3
           if-no-files-found: ignore
 
