@@ -1,0 +1,230 @@
+name: Cypress AI Analysis
+run-name: ai-analysis
+# Reusable workflow for analyzing Cypress test failures with Kilo CLI
+
+on:
+  workflow_call:
+    inputs:
+      regression_result:
+        description: 'Result of the regression-testing job (success/failure)'
+        required: true
+        type: string
+      run_flag:
+        description: 'Whether tests were run'
+        required: true
+        type: string
+      merge_confidence_threshold:
+        description: 'Minimum merge confidence percentage to allow merge'
+        required: false
+        type: number
+        default: 60
+      pr_number:
+        description: 'Pull request number'
+        required: true
+        type: number
+      pr_sha:
+        description: 'Pull request head SHA'
+        required: true
+        type: string
+    secrets:
+      OPENROUTER_API_KEY:
+        description: 'OpenRouter API key for Kilo CLI'
+        required: true
+
+env:
+  MODEL_NAME: ${{ vars.CYPRESS_KILO_MODEL != '' && vars.CYPRESS_KILO_MODEL || 'openrouter/anthropic/claude-opus-4.7' }}
+
+jobs:
+  analyze-failures:
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.pr_sha }}
+
+      - name: Set up Node.js
+        if: ${{ inputs.regression_result == 'failure' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Get PR Files
+        id: pr-files
+        if: ${{ inputs.regression_result == 'failure' }}
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          REPO_PATH: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILES=$(gh pr view $PR_NUMBER --json files --jq '.files[].path' | jq -R -s -c 'split("\n")[:-1]')
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+
+      - name: Get PR Diff
+        id: pr-diff
+        if: ${{ inputs.regression_result == 'failure' }}
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          REPO_PATH: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DIFF=$(gh pr diff $PR_NUMBER)
+          {
+            echo "pr_diff<<EOF"
+            echo "$DIFF"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Download test artifacts
+        if: ${{ inputs.regression_result == 'failure' }}
+        uses: actions/download-artifact@v7
+        with:
+          pattern: cypress-artifacts-*
+          path: cypress/results
+          merge-multiple: true
+
+      - name: Download dev server logs
+        if: ${{ inputs.regression_result == 'failure' }}
+        uses: actions/download-artifact@v7
+        with:
+          pattern: dev-server-logs-*
+          path: dev-logs
+          merge-multiple: true
+
+      - name: Setup Kilo CLI analysis inputs
+        if: ${{ inputs.regression_result == 'failure' }}
+        env:
+          PR_FILES: ${{ steps.pr-files.outputs.files }}
+          PR_DIFF: ${{ steps.pr-diff.outputs.pr_diff }}
+        run: |
+          echo "========================================================"
+          echo "Create reports directory and write all report files..."
+          mkdir -p cypress/results/reports
+
+          echo "Writing PR files and diff to reports directory"
+          echo "$PR_FILES" > cypress/results/reports/pr-files.txt
+          echo "$PR_DIFF" > cypress/results/reports/pr-diff.txt
+
+          echo "Copying Kilo configuration file"
+          cp .github/assets/kilo-ci-openrouter.json cypress/results/kilo.json
+
+          echo "All report files written to reports directory"
+          echo "========================================================"
+
+          # Verify files were created
+          echo "========================================================"
+          echo "Verifying required report files:"
+          [ -f "cypress/results/reports/pr-files.txt" ] && echo "✓ pr-files.txt created" || echo "✗ pr-files.txt MISSING"
+          [ -f "cypress/results/reports/pr-diff.txt" ] && echo "✓ pr-diff.txt created" || echo "✗ pr-diff.txt MISSING"
+          echo "========================================================"
+
+          # Check for dev server logs
+          echo "Checking for dev server logs:"
+          DEV_LOGS=$(find dev-logs -name "*.log" 2>/dev/null | wc -l)
+          [ $DEV_LOGS -gt 0 ] && echo "✓ Found $DEV_LOGS dev server log file(s)" || echo "✗ No dev server logs found"
+
+          # Check for screenshots
+          echo "Checking for screenshots:"
+          SCREENSHOTS=$(find cypress/results -name "*.png" 2>/dev/null | wc -l)
+          [ $SCREENSHOTS -gt 0 ] && echo "✓ Found $SCREENSHOTS screenshot(s)" || echo "✗ No screenshots found"
+
+          # Check for verbose reports (JSON)
+          echo "Checking for verbose reports:"
+          VERBOSE_REPORTS=$(find cypress/results -path "*/reports/verbose/*.json" 2>/dev/null | wc -l)
+          [ $VERBOSE_REPORTS -gt 0 ] && echo "✓ Found $VERBOSE_REPORTS verbose report(s)" || echo "✗ No verbose reports found"
+          echo "========================================================"
+
+      - name: Install Kilo CLI
+        id: install-kilo-cli
+        if: ${{ inputs.regression_result == 'failure' }}
+        run: npm install -g @kilocode/cli
+
+      - name: Kilo CLI Failures Analysis
+        id: kilo_analysis
+        timeout-minutes: 20
+        if: ${{ inputs.regression_result == 'failure' }}
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MODEL_NAME: ${{ env.MODEL_NAME }}
+        run: |
+          cd cypress/results
+          kilo run --auto "$(cat $GITHUB_WORKSPACE/prompts/analyze-test-failures.md)"
+
+          # Write analysis to GitHub output with comment marker
+          {
+            echo "failure_analysis<<EOF"
+            echo "<!-- FAILURE_ANALYSIS_COMMENT -->"
+            cat failure-analysis.md
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Expect Cypress Status or Merge Confidence above threshold
+        id: expect-passed
+        if: ${{ always() && inputs.run_flag == 'true' }}
+        env:
+          TEST_STATUS: ${{ inputs.regression_result }}
+          MERGE_CONFIDENCE_THRESHOLD: ${{ inputs.merge_confidence_threshold }}
+        run: |
+          METADATA_FILE="cypress/results/failure-metadata.json"
+
+          # Write summary header
+          echo "## Cypress Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** $TEST_STATUS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Handle SUCCESS status
+          if [[ "$TEST_STATUS" == "success" ]]; then
+            echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Cypress tests passed"
+            echo "should-request-changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Handle FAILED status - check merge confidence
+          echo "❌ Tests failed. Check the PR comment for AI-generated failure analysis." >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "$METADATA_FILE" ]; then
+            echo "Reading failure metadata..."
+            MERGE_CONFIDENCE=$(jq -r '.mergeConfidence' "$METADATA_FILE")
+            FAILURE_TYPE=$(jq -r '.failureType' "$METADATA_FILE")
+            
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Failure Type:** $FAILURE_TYPE" >> $GITHUB_STEP_SUMMARY
+            echo "**Merge Confidence:** ${MERGE_CONFIDENCE}%" >> $GITHUB_STEP_SUMMARY
+            
+            echo "Failure Type: $FAILURE_TYPE"
+            echo "Merge Confidence: $MERGE_CONFIDENCE"
+            
+            if [ "$MERGE_CONFIDENCE" -lt "$MERGE_CONFIDENCE_THRESHOLD" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "🚫 **Merge Blocked**: Confidence ${MERGE_CONFIDENCE}% is below threshold (${MERGE_CONFIDENCE_THRESHOLD}%)" >> $GITHUB_STEP_SUMMARY
+              echo "::error ::Cypress tests FAILED with merge confidence of ${MERGE_CONFIDENCE}% (threshold: ${MERGE_CONFIDENCE_THRESHOLD}%). Failure type: $FAILURE_TYPE"
+              echo "should-request-changes=false" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "✅ **Merge Allowed**: Confidence ${MERGE_CONFIDENCE}% meets threshold (${MERGE_CONFIDENCE_THRESHOLD}%+)" >> $GITHUB_STEP_SUMMARY
+              echo "::warning ::Cypress tests FAILED but merge confidence is ${MERGE_CONFIDENCE}% (>= ${MERGE_CONFIDENCE_THRESHOLD}%). Failure type: $FAILURE_TYPE. Allowing merge."
+              echo "should-request-changes=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **No failure analysis available**" >> $GITHUB_STEP_SUMMARY
+            echo "::error ::Cypress tests FAILED and no failure metadata found"
+            echo "should-request-changes=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Comment PR with Analysis
+        if: ${{ always() && inputs.regression_result == 'failure' && steps.install-kilo-cli.outcome != 'failure' && steps.kilo_analysis.outputs.failure_analysis != '' }}
+        uses: ./.github/actions/review-pr-changes
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: ${{ inputs.pr_number }}
+          body_includes: '<!-- FAILURE_ANALYSIS_COMMENT -->'
+          comment_body: ${{ steps.kilo_analysis.outputs.failure_analysis }}
+          comment_only: 'true'
+          delete_and_repost: 'true'

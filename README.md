@@ -1,222 +1,71 @@
-# Cypress Specs Traceability Demo
+# Cypress Ops Demo Repository
 
-> A demonstration repository showcasing intelligent test selection using code coverage mapping to run only relevant Cypress specs based on source code changes in Pull Requests.
+> Smart test selection + AI failure analysis + Allure reports. Run only what matters.
 
-## 🎯 Purpose
+> **Note:** This demo is built on top of the [Cypress RealWorld App](https://github.com/cypress-io/cypress-realworld-app) — a full-stack payment application used as a playground to showcase advanced Cypress testing patterns and CI/CD workflows.
 
-This repository demonstrates how to:
+## Available Guides
 
-1. **Generate Coverage Maps** - Automatically track which Cypress tests cover which source files
-2. **Intelligent Test Selection** - Run only the specs that test the code changed in a PR
-3. **Optimize CI/CD** - Reduce test execution time by running targeted regression tests
-4. **Maintain Quality** - Ensure code changes are properly tested without running the entire suite
+1. **[Smart Test Selection](./docs/smart-test-selection.md)** - Coverage maps tell us which tests cover which code. PRs only run relevant specs.
 
-## 🚀 Quick Start
+2. **[AI Failure Analysis](./docs/ai-failure-analysis.md)** - AI (Kilo) CLI analyzes failures, determines root cause, assigns merge confidence scores, posts analysis as PR comment and blocks merge if confidence < threshold (default: 60%).
 
-### Prerequisites
+3. **[Allure Reports](https://python.plainenglish.io/from-tests-to-reports-hosting-playwright-traces-and-allure-reports-via-github-actions-c93a4f1877c3)** - Visual test reports deployed to GitHub Pages automatically.
 
-- [Node.js](https://nodejs.org/en/) (see [.node-version](./.node-version) for exact version)
-- npm or yarn
-
-### Installation
+## Quick Setup
 
 ```bash
-git clone <repository-url>
-cd cypress-specs-traceability
 npm install
-```
-
-### Run the Application
-
-```bash
-# Start the app with coverage enabled
-npm run dev:coverage
-```
-
-The app runs on:
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001
-
-### Run Cypress Tests
-
-```bash
-# Open Cypress Test Runner
+npm run dev:coverage  # Frontend: :3000, Backend: :3001
 npm run cypress:open
-
-# Run tests in headless mode with coverage mapping
-npm run cypress:run -- --env coverage=true,mapCoverage=true
 ```
 
-## 📊 Coverage Mapping
+## 🔧 Key Files
 
-### How It Works
-
-1. **During Test Execution**: 
-   - Frontend coverage is collected from `window.__coverage__`
-   - Backend coverage is collected from `/__coverage__` endpoint
-   - Each test's coverage is mapped to source files
-
-2. **Coverage Map Generation**:
-   - Maps are stored in `cypress/results/reports/coverage-map/`
-   - Structure: `{ "src/file.ts": { "spec.cy.ts": { "test name": statementCount } } }`
-
-3. **PR Test Selection**:
-   - Python script analyzes changed files in PR
-   - Identifies specs with highest coverage for those files
-   - Outputs only relevant specs to run
-
-### Enable Coverage Mapping
-
-Set environment variables:
-
-```bash
-# Enable frontend coverage mapping
-MAP_COVERAGE=true
-
-# Enable backend coverage mapping  
-MAP_NODE_COVERAGE=true
-
-# Enable verbose failure reports
-VERBOSE_FAILURES=true
+```
+.github/
+├── workflows/
+│   ├── cypress-pr-regression.yml      # Main PR workflow
+│   ├── cypress-ai-analysis.yml        # AI failure analysis
+│   └── allure-gh-pages.yml            # Report deployment
+├── scripts/
+│   └── cypress-src-to-specs-filter.py # Spec filtering logic
+└── actions/
+    └── review-pr-changes/             # Smart PR comments/reviews
+cypress/
+├── support/
+│   ├── commands.ts                    # cy.mapCoverage(), cy.writeVerboseReport
+│   └── e2e.ts                         # Auto coverage collection hooks
+└── results/reports/
+    ├── coverage-map/                  # Generated maps
+    ├── verbose/                       # Failure details (DOM, logs)
+    └── allure-results/                # Allure raw data
 ```
 
-Or in [`cypress.config.ts`](./cypress.config.ts):
+## 🎨 Custom Cypress Commands
 
 ```typescript
-env: {
-  mapCoverage: true,
-  mapNodeCoverage: true,
-  verboseFailures: true,
-}
+// Map coverage for current test
+cy.mapCoverage()
+
+// Write verbose failure report (auto-called on failure)
+cy.writeVerboseReport()
 ```
 
-## 🔧 Key Features
+## 📖 More Docs
 
-### 1. Custom Cypress Commands
+- [Authentication Setup](./docs/authentication.md)
+- [Database & Seeding](./docs/database.md)
+- [NPM Scripts](./docs/npm-scripts.md)
+- [Code Coverage](./docs/code-coverage.md)
 
-- **[`cy.mapCoverage()`](./cypress/support/commands.ts)** - Maps test coverage to source files
-- **[`cy.writeVerboseReport()`](./cypress/support/commands.ts)** - Generates detailed failure reports with DOM snapshots
+## 🔗 Resources
 
-### 2. Automated Test Hooks
-
-- **beforeEach**: Cleans up reports and resets coverage counters
-- **afterEach**: Collects coverage data and writes verbose reports for failures
-
-### 3. Intelligent Spec Filter
-
-[`.github/scripts/cypress-src-to-specs-filter.py`](./.github/scripts/cypress-src-to-specs-filter.py) analyzes PR changes and outputs:
-- Filtered list of relevant specs
-- Optimal parallel container configuration
-- Regression vs full test run indicator
-
-## 📁 Project Structure
-
-```
-cypress-specs-traceability/
-├── .github/
-│   └── scripts/
-│       └── cypress-src-to-specs-filter.py  # PR-based spec filtering
-├── backend/                                 # Express API with coverage endpoints
-├── cypress/
-│   ├── src/                                # Test specs
-│   │   ├── api/                           # API tests
-│   │   └── ui/                            # UI tests
-│   ├── support/
-│   │   ├── commands.ts                    # Custom commands
-│   │   └── e2e.ts                         # Test hooks
-│   └── results/
-│       └── reports/
-│           ├── coverage-map/              # Generated coverage maps
-│           └── verbose/                   # Verbose failure reports
-├── src/                                    # React frontend
-└── docs/                                   # Additional documentation
-```
-
-## 📖 Documentation
-
-- [Third-Party Authentication](./docs/authentication.md) - Auth0, Okta, Cognito, Google setup
-- [Database & Seeding](./docs/database.md) - Database management and test data
-- [NPM Scripts Reference](./docs/npm-scripts.md) - Complete list of available commands
-- [Code Coverage Guide](./docs/code-coverage.md) - Detailed coverage setup and usage
-
-## 🧪 Running Tests
-
-### Local Development
-
-```bash
-# Run all tests with coverage
-npm run cypress:run -- --env coverage=true,mapCoverage=true
-
-# Run specific spec
-npm run cypress:run -- --spec "cypress/src/ui/auth.spec.ts"
-
-# Open Test Runner
-npm run cypress:open
-```
-
-### CI/CD Integration
-
-```yaml
-# Example GitHub Actions workflow
-- name: Filter Specs Based on PR Changes
-  id: filter
-  run: python .github/scripts/cypress-src-to-specs-filter.py
-  env:
-    PR_FILENAMES: ${{ steps.changed-files.outputs.all_changed_files }}
-    MAP_FILE_PATH: cypress/results/reports/coverage-map/coverage-map.json
-
-- name: Run Filtered Specs
-  run: npm run cypress:run -- --spec "${{ steps.filter.outputs.spec-paths }}"
-```
-
-## 🔍 Coverage Map Example
-
-```json
-{
-  "src/containers/App.tsx": {
-    "cypress/src/ui/auth.spec.ts": {
-      "logs in successfully": 45,
-      "displays error on invalid credentials": 23
-    }
-  },
-  "backend/user-routes.ts": {
-    "cypress/src/api/api-users.spec.ts": {
-      "GET /users returns all users": 67
-    }
-  }
-}
-```
-
-## 📝 Environment Variables
-
-```bash
-# Coverage
-MAP_COVERAGE=true                    # Enable frontend coverage mapping
-MAP_NODE_COVERAGE=true               # Enable backend coverage mapping
-VERBOSE_FAILURES=true                # Enable verbose failure reports
-
-# Application
-PORT=3000                            # Frontend port
-VITE_BACKEND_PORT=3001              # Backend port
-SEED_DEFAULT_USER_PASSWORD=s3cret   # Default user password
-```
-
-## 🤝 Contributing
-
-This is a demonstration repository. Feel free to fork and adapt for your own projects.
-
-## 📄 License
-
-[![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/cypress-io/cypress/blob/master/LICENSE)
-
-This project is licensed under the terms of the [MIT license](/LICENSE).
-
-## 🔗 Related Resources
-
-- [Cypress Documentation](https://docs.cypress.io)
-- [Cypress Code Coverage Plugin](https://github.com/cypress-io/code-coverage)
-- [Original Cypress Real World App](https://github.com/cypress-io/cypress-realworld-app)
+- [Original Cypress RWA](https://github.com/cypress-io/cypress-realworld-app)
+- [Cypress Docs](https://docs.cypress.io)
+- [Kilo CLI](https://github.com/kilocode/cli)
+- [Allure Framework](https://allurereport.org)
 
 ---
 
-**Built with** [Cypress](https://cypress.io) | Based on [Cypress Real World App](https://github.com/cypress-io/cypress-realworld-app)
+**Built with** [Cypress](https://cypress.io) | **AI by** [Kilo](https://kilo.dev) | **Reports by** [Allure](https://allurereport.org)

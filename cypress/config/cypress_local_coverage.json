@@ -6,7 +6,7 @@
         "coverage": true,
         "mapCoverage": true,
         "mapNodeCoverage": true,
-        "verboseFailures": true,
+        "verboseFailures": false,
         "codeCoverage": {
             "url": "http://localhost:3001/__coverage__",
             "exclude": "cypress/**/*.*"

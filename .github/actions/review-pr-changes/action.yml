@@ -1,0 +1,171 @@
+name: 'Review PR Changes'
+description: 'Post PR comments or reviews with smart management'
+
+inputs:
+  github_token:
+    description: 'Github API Token'
+    required: true
+  pr_number:
+    description: 'Pull request number'
+    required: true
+  comment_body:
+    description: 'Body content of the review or comment'
+    required: true
+  body_includes:
+    description: 'Text to match existing reviews/comments (acts as an identifier)'
+    required: true
+  comment_only:
+    description: 'If true, post as a regular comment. If false, post as a PR review'
+    required: false
+    default: 'false'
+  request_changes:
+    description: 'If true and comment_only=false, request changes. If false, just add a review comment'
+    required: false
+    default: 'false'
+  repository:
+    description: 'Repository in format owner/repo (defaults to current repository)'
+    required: false
+    default: ''
+  delete_and_repost:
+    description: 'For comment_only mode: if true, delete and repost comment instead of updating'
+    required: false
+    default: 'true'
+  resolved:
+    description: 'If true, dismiss/delete existing reviews/comments without creating new ones'
+    required: false
+    default: 'false'
+
+runs:
+  using: "composite"
+  steps:
+    # Comment-only mode: Use replace-github-comment logic
+    - name: Find existing comment
+      if: inputs.comment_only == 'true'
+      uses: peter-evans/find-comment@v4
+      id: find-comment
+      with:
+        token: ${{ inputs.github_token }}
+        issue-number: ${{ inputs.pr_number }}
+        body-includes: ${{ inputs.body_includes }}
+
+    - name: Delete existing comment
+      if: inputs.comment_only == 'true' && ((inputs.resolved == 'true' && steps.find-comment.outputs.comment-id != '') || (inputs.delete_and_repost == 'true' && steps.find-comment.outputs.comment-id != ''))
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const commentId = '${{ steps.find-comment.outputs.comment-id }}';
+          await github.rest.issues.deleteComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: commentId
+          });
+
+    - name: Create new comment
+      if: inputs.comment_only == 'true' && inputs.resolved != 'true' && (inputs.delete_and_repost == 'true' || steps.find-comment.outputs.comment-id == '')
+      uses: peter-evans/create-or-update-comment@v5
+      with:
+        token: ${{ inputs.github_token }}
+        issue-number: ${{ inputs.pr_number }}
+        body: ${{ inputs.comment_body }}
+
+    - name: Update existing comment
+      if: inputs.comment_only == 'true' && inputs.resolved != 'true' && inputs.delete_and_repost != 'true' && steps.find-comment.outputs.comment-id != ''
+      uses: peter-evans/create-or-update-comment@v5
+      with:
+        token: ${{ inputs.github_token }}
+        issue-number: ${{ inputs.pr_number }}
+        body: ${{ inputs.comment_body }}
+        comment-id: ${{ steps.find-comment.outputs.comment-id }}
+
+    # Review mode: Use request-pr-changes logic
+    - name: Find and manage existing reviews
+      if: inputs.comment_only == 'false'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+        PR_NUMBER: ${{ inputs.pr_number }}
+        REPOSITORY: ${{ inputs.repository }}
+        BODY_INCLUDES: ${{ inputs.body_includes }}
+      run: |
+        echo "Checking for existing reviews on PR #${PR_NUMBER}..."
+        
+        # Get ALL matching reviews regardless of state (COMMENTED, CHANGES_REQUESTED, APPROVED, DISMISSED)
+        REVIEW_DATA=$(gh api \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          "/repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews" \
+          --jq '[.[] | select(.body | contains("'"${BODY_INCLUDES}"'")) | {id: .id, state: .state}]')
+        
+        REVIEW_COUNT=$(echo "$REVIEW_DATA" | jq 'length')
+        echo "Found ${REVIEW_COUNT} matching review(s)"
+        
+        if [ "$REVIEW_COUNT" -gt 0 ]; then
+          echo "$REVIEW_DATA" | jq -c '.[]' | while IFS= read -r review; do
+            review_id=$(echo "$review" | jq -r '.id')
+            review_state=$(echo "$review" | jq -r '.state')
+            echo "Processing review ID: ${review_id} (state: ${review_state})"
+            
+            # Dismiss if the review is in a dismissable state
+            if [ "$review_state" = "CHANGES_REQUESTED" ] || [ "$review_state" = "APPROVED" ]; then
+              echo "  Dismissing review ${review_id}..."
+              gh api \
+                --method PUT \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "/repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews/${review_id}/dismissals" \
+                -f message="Review dismissed - superseded by newer review" \
+                -f event="DISMISS" || echo "  Warning: Could not dismiss review ${review_id}"
+            fi
+            
+            # Clear the review body so old content doesn't clutter the PR. Preserve the BODY_INCLUDES identifier so future runs can still find (and dismiss) reviews
+            echo "  Clearing body of review ${review_id}..."
+            gh api \
+              --method PUT \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "/repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews/${review_id}" \
+              -f body="<!-- ${BODY_INCLUDES} --> _This review has been superseded by a newer analysis._" || echo "  Warning: Could not update review body ${review_id}"
+          done
+          
+          echo "✓ Cleaned up existing reviews"
+        else
+          echo "No existing reviews found with matching identifier"
+        fi
+
+    - name: Submit PR Review
+      if: inputs.comment_only == 'false' && inputs.resolved != 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+        PR_NUMBER: ${{ inputs.pr_number }}
+        REPOSITORY: ${{ inputs.repository }}
+        REQUEST_CHANGES: ${{ inputs.request_changes }}
+      run: |
+        echo "Submitting review on PR #${PR_NUMBER}..."
+        
+        # Create a temporary file for the review body
+        REVIEW_BODY_FILE=$(mktemp)
+        cat > "$REVIEW_BODY_FILE" << 'EOF'
+        ${{ inputs.comment_body }}
+        EOF
+        
+        # Submit the review with appropriate flag
+        if [ "$REQUEST_CHANGES" = "true" ]; then
+          echo "Requesting changes on PR #${PR_NUMBER}..."
+          gh pr review "${PR_NUMBER}" \
+            --repo "${REPOSITORY}" \
+            --request-changes \
+            --body-file "$REVIEW_BODY_FILE"
+          echo "✓ Successfully requested changes on PR #${PR_NUMBER}"
+        else
+          echo "Adding review comment to PR #${PR_NUMBER}..."
+          gh pr review "${PR_NUMBER}" \
+            --repo "${REPOSITORY}" \
+            --comment \
+            --body-file "$REVIEW_BODY_FILE"
+          echo "✓ Successfully added review comment on PR #${PR_NUMBER}"
+        fi
+        
+        # Clean up temp file
+        rm -f "$REVIEW_BODY_FILE"

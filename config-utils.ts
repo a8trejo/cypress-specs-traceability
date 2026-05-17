@@ -14,6 +14,7 @@ const cleanReports = (reportPath: string) => {
     if (fs.existsSync(reportPath)) {
         fs.rmdirSync(reportPath, { recursive: true })
     }
+    fs.mkdirSync(reportPath, { recursive: true})
 }
 
 /**

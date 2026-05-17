@@ -1,0 +1,119 @@
+name: Generate and Deploy Allure Report to GitHub Pages
+run-name: allure-gh-pages
+# Reusable workflow for generating Allure reports and deploying to GitHub Pages
+
+on:
+  workflow_call:
+    inputs:
+      pr_number:
+        description: 'Pull request number'
+        required: true
+        type: number
+      pr_sha:
+        description: 'Pull request head SHA'
+        required: true
+        type: string
+      run_id:
+        description: 'GitHub run ID'
+        required: true
+        type: string
+      deployment_type:
+        description: 'Type of deployment: pr or main'
+        required: false
+        type: string
+        default: 'pr'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  allure-gh-pages-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.pr_sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Download all test artifacts
+        uses: actions/download-artifact@v7
+        with:
+          pattern: cypress-artifacts-*
+          path: cypress
+          merge-multiple: true
+
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
+
+      - name: Generate Allure HTML report
+        run: npm run allure:generate
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v6
+
+      - name: Prepare Report Directory Structure
+        run: |
+          mkdir -p public
+          
+          # Copy generated Allure report directly to public root
+          if [ -d "cypress/results/reports/allure-report" ]; then
+            cp -r cypress/results/reports/allure-report/* public/
+            echo "✓ Allure report copied to public/"
+          else
+            echo "⚠ No Allure report found, creating placeholder"
+            cat > public/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head><title>Report Not Available</title></head>
+          <body style="font-family: Arial, sans-serif; margin: 40px; text-align: center;">
+            <h1>Allure Report Generation Failed</h1>
+            <p>The Allure report could not be generated. Check the workflow logs for details.</p>
+          </body>
+          </html>
+          EOF
+          fi
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+      - name: Comment PR with Allure Report Link
+        if: ${{ inputs.deployment_type == 'pr' }}
+        uses: ./.github/actions/review-pr-changes
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: ${{ inputs.pr_number }}
+          body_includes: '<!-- ALLURE_REPORT_COMMENT -->'
+          comment_body: |
+            <!-- ALLURE_REPORT_COMMENT -->
+            ## 📊 Allure Test Report
+            
+            The Allure report for this PR has been generated and deployed to GitHub Pages.
+            
+            **[🔗 View Allure Report](${{ steps.deployment.outputs.page_url }})**
+            
+            **Report Details:**
+            - PR: #${{ inputs.pr_number }}
+            - Run ID: `${{ inputs.run_id }}`
+            - Commit: `${{ inputs.pr_sha }}`
+            
+            ---
+            *This report will be available until the next deployment overwrites it.*
+          comment_only: 'true'
+          delete_and_repost: 'true'

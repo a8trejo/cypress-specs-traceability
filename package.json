@@ -12,6 +12,9 @@
   "license": "MIT",
   "author": "Cypress-io",
   "scripts": {
+    "allure:generate": "allure generate cypress/results/reports/allure-results --clean -o cypress/results/reports/allure-report",
+    "allure:open": "allure open cypress/results/reports/allure-report",
+    "allure:serve": "allure serve cypress/results/reports/allure-results",
     "prebuild": "npm run types",
     "build": "vite build",
     "build:aws-exports-es5": "cross-env tsc --skipLibCheck --allowJs --lib 'es5' --module 'commonjs' --target 'es5' --moduleResolution 'node' --outDir . src/aws-exports.js; mv aws-exports.js aws-exports-es5.js",
@@ -22,7 +25,7 @@
     "copy:mock:awsexports": "ncp scripts/mock-aws-exports.js src/aws-exports.js",
     "copy:mock:awsexportses5": "ncp scripts/mock-aws-exports-es5.js aws-exports-es5.js",
     "precypress:open": "npm run predev:cognito:ci",
-    "cypress:open": "cypress open",
+    "cypress:open": "ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=9222 npx cypress open",
     "cypress:open:mobile": "cypress open --config '{\"e2e\":{\"viewportWidth\":375,\"viewportHeight\":667}}'",
     "cypress:run": "cypress run",
     "cypress:run:component": "cypress run --component",
@@ -172,7 +175,7 @@
     "@types/lodash": "4.14.181",
     "@types/lowdb": "1.0.11",
     "@types/morgan": "1.9.3",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.8.0",
     "@types/passport": "1.0.16",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
@@ -186,6 +189,8 @@
     "@types/yup": "0.29.13",
     "@typescript-eslint/parser": "^8.58.2",
     "@vitejs/plugin-react": "^5.0.1",
+    "allure-commandline": "^2.41.0",
+    "allure-cypress": "^3.8.0",
     "babel-loader": "^10.0.0",
     "bcryptjs": "2.4.3",
     "concurrently": "9.1.2",
@@ -220,7 +225,7 @@
     "jsdom": "^22.1.0",
     "json": "11.0.0",
     "jwks-rsa": "2.0.5",
-    "knip": "^6.4.1",
+    "knip": "^6.14.1",
     "lint-staged": "^15.5.0",
     "lodash": "^4.17.21",
     "lowdb": "1.0.0",
@@ -239,7 +244,7 @@
     "sort-package-json": "^3.0.0",
     "start-server-and-test": "1.14.0",
     "ts-node": "10.9.2",
-    "typescript": "5.8.3",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.1.3",
     "vite-plugin-eslint": "^1.8.1",
@@ -249,24 +254,6 @@
   },
   "engines": {
     "node": "^20.0.0 || ^22.0.0 || ^24.0.0"
-  },
-  "knip": {
-    "entry": [
-      "cypress.config.ts",
-      "cypress/src/**/*.{spec,cy}.{js,jsx,ts,tsx}",
-      "cypress/support/e2e.ts",
-      "cypress/support/component.ts"
-    ],
-    "project": [
-      "cypress/**/*.ts",
-      "config-utils.ts",
-      "cypress/support/utils/*.ts"
-    ],
-    "ignoreDependencies": [
-      "mysql",
-      "cypress",
-      "cypress-plugin-api"
-    ]
   },
   "percy": {
     "version": 1,
