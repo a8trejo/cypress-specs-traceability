@@ -253,6 +253,13 @@ async function setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginC
     cypressSplit(on, config)
 
     // Allure Cypress reporter
+    // Ensure the allure results directory exists
+    const allureResultsDir = 'cypress/results/reports/allure-results'
+    if (!fs.existsSync(allureResultsDir)) {
+        fs.mkdirSync(allureResultsDir, { recursive: true })
+    }
+
+    // Allure Cypress reporter
     // Configure with proper paths to avoid ENOENT errors with screenshots
     allureCypress(on, config, {
         resultsDir: 'cypress/results/reports/allure-results',
