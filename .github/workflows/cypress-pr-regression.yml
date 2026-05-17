@@ -329,7 +329,6 @@ jobs:
 
   # Generate and deploy Allure report to GitHub Pages
   allure-report:
-    name: Allure Report
     needs: [set-globals, regression-testing]
     if: always() && needs.set-globals.outputs.RUN_FLAG == 'true'
     uses: ./.github/workflows/allure-gh-pages.yml
@@ -341,7 +340,6 @@ jobs:
 
   # Call reusable workflow for AI analysis
   cypress-results:
-    name: Cypress Results
     needs: [set-globals, regression-testing]
     if: always()
     uses: ./.github/workflows/cypress-ai-analysis.yml

@@ -57,11 +57,10 @@ jobs:
         run: npm install -g allure-commandline
 
       - name: Generate Allure HTML report
-        continue-on-error: true
         run: npm run allure:generate
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Prepare Report Directory Structure
         run: |
@@ -69,8 +68,8 @@ jobs:
           mkdir -p public/$REPORT_ID
           
           # Copy generated Allure report
-          if [ -d "cypress/results/allure-report" ]; then
-            cp -r cypress/results/allure-report/* public/$REPORT_ID/
+          if [ -d "cypress/results/reports/allure-report" ]; then
+            cp -r cypress/results/reports/allure-report/* public/$REPORT_ID/
             echo "✓ Allure report copied to public/$REPORT_ID/"
           else
             echo "⚠ No Allure report found, creating placeholder"
@@ -133,7 +132,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Comment PR with Allure Report Link
         if: ${{ inputs.deployment_type == 'pr' }}
