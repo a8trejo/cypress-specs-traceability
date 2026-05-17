@@ -30,8 +30,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  generate-and-deploy:
-    name: Generate and Deploy Allure Report
+  allure-gh-pages-deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -86,7 +85,7 @@ jobs:
           fi
 
       - name: Upload artifact for Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
@@ -96,10 +95,10 @@ jobs:
 
       - name: Comment PR with Allure Report Link
         if: ${{ inputs.deployment_type == 'pr' }}
-        uses: ./.github/actions/post-github-comment
+        uses: ./.github/actions/review-pr-changes
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          issue_number: ${{ inputs.pr_number }}
+          pr_number: ${{ inputs.pr_number }}
           body_includes: '<!-- ALLURE_REPORT_COMMENT -->'
           comment_body: |
             <!-- ALLURE_REPORT_COMMENT -->
@@ -116,4 +115,5 @@ jobs:
             
             ---
             *This report will be available until the next deployment overwrites it.*
-          delete_and_repost: 'false'
+          comment_only: 'true'
+          delete_and_repost: 'true'

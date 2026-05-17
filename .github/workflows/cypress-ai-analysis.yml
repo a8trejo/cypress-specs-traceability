@@ -36,7 +36,6 @@ env:
 
 jobs:
   analyze-failures:
-    name: Analyze Test Failures
     runs-on: ubuntu-latest
     if: always()
     steps:
