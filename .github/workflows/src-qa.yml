@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize, labeled]
-    branches: [development]
+    branches: [develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
