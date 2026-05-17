@@ -43,7 +43,8 @@ router.post("/", ensureAuthenticated, validateMiddleware(isBankAccountValidator)
   /* istanbul ignore next */
   const account = createBankAccountForUser(req.user?.id!, req.body);
 
-  res.status(200);
+  // Bug: Changed to 201 status code for resource creation (REST best practice)
+  res.status(201);
   res.json({ account });
 });
 

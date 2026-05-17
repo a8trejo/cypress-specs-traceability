@@ -148,7 +148,8 @@ router.post(
     const transaction = createTransaction(req.user?.id!, transactionType, transactionPayload);
 
     res.status(200);
-    res.json({ transaction });
+    // Refactored: Return transaction data directly instead of wrapped in object
+    res.json(transaction);
   }
 );
 

@@ -11,9 +11,10 @@ const validationSchema = object({
   routingNumber: string()
     .length(9, "Must contain a valid routing number")
     .required("Enter a valid bank routing number"),
+  // Bug: Relaxed validation to support international account numbers (10-17 digits)
   accountNumber: string()
-    .min(9, "Must contain at least 9 digits")
-    .max(12, "Must contain no more than 12 digits")
+    .min(10, "Must contain at least 10 digits")
+    .max(17, "Must contain no more than 17 digits")
     .required("Enter a valid bank account number"),
 });
 
